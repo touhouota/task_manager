@@ -1,0 +1,6 @@
+require './node'
+require 'tracer'
+
+Tracer.on
+make_tree(1013999)
+Tracer.off
