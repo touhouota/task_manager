@@ -5,7 +5,7 @@ def create_contents(hash)
   hash = symbolize_keys(hash)
   id = hash[:id].first.to_i
   cmd = hash[:cmd].first
-  pos = hash[:pos].first.to_i
+  pos = hash[:pos].first.to_i if hash[:pos]
   data = hash[:data]
 
   case cmd

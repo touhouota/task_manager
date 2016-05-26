@@ -9,32 +9,6 @@ function createRequest(){
   return request;
 }
 
-// サーバに、ユーザ情報が登録されている場合の処理
-function login(){
-
-}
-
-function user_exist(){
-    // ユーザの情報がサーバにあるかどうかを確認する処理
-    if(this.readyState == 4){
-	var res = this.responseText;
-	var message;
-	console.log("res = " + res);
-	if(res){
-	    // ユーザ情報があるとき
-	    login();
-	}else{
-	    message = "データがありませんでした。新しく作成しますか？";
-	    if(confirm(message)){
-		window.location = "./task_list.html"
-	    }else{
-		message = "入力をもう一度確認してください";
-		alert(message);
-	    }
-	}
-    }
-}
-
 // フィールドに入力があるかを確認する
 function check(){
     var form = document.forms.form.user_id.value;
@@ -46,7 +20,27 @@ function check(){
 	url = "?id=" + form + "&cmd=exist"
 	if(request){
 	    request.open("GET", "./back.rb" + url, true);
-	    request.onreadystatechange = user_exist;
+	    request.onreadystatechange = function(){
+		if(this.readyState == 4){
+		    var res = this.responseText;
+		    console.log(res);
+		    res = JSON.parse(res);
+		    var message;
+		    console.log("res = " + res["exist"]);
+		    if(res['exist']){
+			// ユーザ情報があるとき
+			window.location = "./task_list.html"
+		    }else{
+			message = "データがありませんでした。新しく作成しますか？";
+			if(confirm(message)){
+			    window.location = "./task_list.html"
+			}else{
+			    message = "入力をもう一度確認してください";
+			    alert(message);
+			}
+		    }
+		}
+	    }
 	}
 	request.send(null);
     }
