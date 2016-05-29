@@ -26,12 +26,12 @@ function check(){
 		    console.log("res = " + res["exist"]);
 		    if(res['exist']){
 			// ユーザ情報があるとき
-			window.location = "./task_list.html"
+			window.location = "./task_list.html?id=" + form;
 		    }else{
 			var message;
 			message = "データがありませんでした。新しく作成しますか？";
 			if(confirm(message)){
-			    window.location = "./task_list.html"
+			    window.location = "./task_list.html?id=" + form;
 			}else{
 			    message = "入力をもう一度確認してください";
 			    alert(message);
