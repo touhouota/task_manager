@@ -5,7 +5,7 @@ require 'mysql2'
 class Node
   attr_accessor :node_id, :parent, :deadline, :status, :task_name, :child
 
-  def initialize(hash={:task_id => -1, :task_name => 'root'}, parent = nil)
+  def initialize(hash={:task_id => 0, :task_name => 'root'}, parent = nil)
     @node_id = hash[:task_id]
     @parent = parent
     @task_name = hash[:task_name]
@@ -61,12 +61,17 @@ class Node
 
   def to_hash
     # json化するためのメソッド
-    {:node_id => @node_id, :status => @status, :deadline => @deadline}
+    {:task_name => @task_name, :status => @status, :deadline => @deadline, :node_id => @node_id}
   end
 
   def to_json
     # 自分自身をJSON化する
-    JSON.generate(self.to_hash)
+    str = ""
+    @child.each do |n|
+      str += '{"node":' + JSON.generate(n.to_hash) + ','
+      str += '"child":' + n.to_json  + ' }'
+    end
+    return '[' + str + ']'
   end
 
   def print_child

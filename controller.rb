@@ -23,8 +23,15 @@ def create_contents(hash)
   when 'group'
   # groupの人を見る部分
   when 'exist'
-  # ユーザ名が存在するかを確認する部分
-    h = {'exist' => true}.to_json
+    # ユーザ名が存在するかを確認する部分
+    $client = Mysql2::Client.new(host: "localhost", username: "task", password: "Pace_maker1", encoding: "utf8", database: "pace")
+    res = $client.query("select * from pace.users where user_id = #{id}")
+    h = Hash.new
+    if(res.entries.empty?) then
+      h.store("exist", false)
+    else
+      h.store("exist", true)
+    end
     print h
   else
     # ちゃんと作ってたら、ここには来ないはず
@@ -37,6 +44,6 @@ def add(id, pos, data)
 end
 
 
-def view(id, pos)
+def view(id, pos=0)
   print make_tree(id).search(pos).to_json
 end

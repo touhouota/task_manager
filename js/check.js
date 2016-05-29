@@ -21,16 +21,16 @@ function check(){
 	if(request){
 	    request.open("GET", "./back.rb" + url, true);
 	    request.onreadystatechange = function(){
-		if(this.readyState == 4){
-		    var res = this.responseText;
+		if(request.readyState == 4){
+		    var res = request.responseText;
 		    console.log(res);
 		    res = JSON.parse(res);
-		    var message;
 		    console.log("res = " + res["exist"]);
 		    if(res['exist']){
 			// ユーザ情報があるとき
 			window.location = "./task_list.html"
 		    }else{
+			var message;
 			message = "データがありませんでした。新しく作成しますか？";
 			if(confirm(message)){
 			    window.location = "./task_list.html"
