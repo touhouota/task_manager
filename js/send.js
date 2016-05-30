@@ -9,7 +9,7 @@ window.onload = function(){
     target.addEventListener("click", listener, false);
     var id = location.search.substr(4);
     console.log(id);
-    //send();
+    send(id, "view", 0);
 }
 
 // クリックした要素の色を変える
@@ -62,10 +62,9 @@ function send(user_id, cmd, pos, node_id, add_name, deadline){
 		console.log(request.responseText);
 		res = request.responseText;
 		if(res != ''){
-		    console.log(request.responseText);
-		    json = JSON.parse(request.responseText);
+		    json = JSON.parse(res);
 		    console.log(json);
-		    document.getElementsByClassName("task_list")[0].innerHTML = rewrite_page(json, position, u_id);
+		    document.getElementsByClassName("task_list")[0].innerHTML = rewrite_page(json, pos, user_id);
 		}else{
 		    alert("データの追加/削除/更新に失敗しました");
 		}
@@ -80,7 +79,8 @@ function send(user_id, cmd, pos, node_id, add_name, deadline){
 function rewrite_page(json, pos, user_id){
     var content = "";
     for(var num in json){
-	var node = response[num].node;
+	var node = json[num].node;
+	console.log(node);
 	content += "<li>\n";
 	content += '<span id=' + node.node_id + '>' + "\n";
 	content += node.task_name + ",";
@@ -88,9 +88,10 @@ function rewrite_page(json, pos, user_id){
 	content += status_array[node.status] + "\n";
 	content += "</span>\n";
 	if(json[num].child.length != 0){
-	    content += rewrite_page(response[num].child);
+	    content += rewrite_page(json[num].child);
 	}
 	content += "</li>\n";
     }
     return "<ol>\n" + content + "</ol>\n";
 }
+B

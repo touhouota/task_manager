@@ -61,17 +61,17 @@ class Node
 
   def to_hash
     # json化するためのメソッド
-    {:task_name => @task_name, :status => @status, :deadline => @deadline, :node_id => @node_id}
+    {:task_name => @task_name, :status => @status, :deadline => @deadline, :node_id => @node_id, :parent_id => @parent.node_id}
   end
 
   def to_json
-    # 自分自身をJSON化する
+    # 自分より下をJSON化する
     str = ""
     @child.each do |n|
       str += '{"node":' + JSON.generate(n.to_hash) + ','
-      str += '"child":' + n.to_json  + ' }'
+      str += '"child":' + n.to_json + '},'
     end
-    return '[' + str + ']'
+    return '[' + str.chop + ']'
   end
 
   def print_child
