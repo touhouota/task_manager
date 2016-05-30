@@ -13,6 +13,7 @@ window.onload = function(){
     console.log(id);
     document.getElementsByClassName("user_name")[0].innerHTML = id;
     send(id, "view", 0);
+    document.forms.controll_form.pos.value = "0";
 }
 
 // クリックした要素の色を変える
@@ -43,9 +44,11 @@ function create_request(){
 
 // フォームから情報をとってsendする
 function get_form(cmd){
-    var form = document.forms.form;
+    var form = document.forms.controll_form;
     var task_name = form.task_name.value;
     var date = form.date.value;
+    var pos = form.pos.value;
+    send(id, cmd.name, pos, node_id, task_name, date);
 }
 
 // サーバへ要求を送る

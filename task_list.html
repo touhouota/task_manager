@@ -6,15 +6,17 @@
 </head>
 <body>
   <div class="user_name">
+
   </div>
   <div class="task_list">
   </div>
   <form class="form" name="controll_form">
     <input type="text" name="task_name" value="">
-    <input type="button" name="add" value="追加">
-    <input type="button" name="upgrade" value="進捗更新">
     <input type="date" name="date">
-    <input type="button" name="delete" value="タスク削除">
+    <input type="button" name="add" value="タスク追加" onclick="get_form('add')">
+    <input type="button" name="upgrade" value="進捗更新" onclick="get_form('upgrade')">
+    <input type="button" name="delete" value="タスク削除" onclick="get_form('delete')">
+    <input type="hidden" name="pos" value="">
   </form>
   <script type="text/javascript" src="./js/send.js">
   </script>
