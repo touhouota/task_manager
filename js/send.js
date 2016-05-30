@@ -1,19 +1,22 @@
 // クリックで選択している要素のid保持
-var node_id = -1;
+var node_id = 0;
 // statusの文句配列
 var status_array = ["未着手...", "進行中", "終了！"];
+var id;
 
 window.onload = function(){
     console.log("きたよ");
     var target = document.getElementsByClassName("task_list")[0];
     target.addEventListener("click", listener, false);
-    var id = location.search.substr(4);
+    // 読み込み時に、最上位ノードを表示
+    id = location.search.substr(4);
     console.log(id);
+    document.getElementsByClassName("user_name")[0].innerHTML = id;
     send(id, "view", 0);
 }
 
 // クリックした要素の色を変える
-function listener(target){
+function listener(ev){
     if(ev.target.id){
 	console.log(node_id);
 	if(node_id > 0){
@@ -25,6 +28,7 @@ function listener(target){
 	if(node_id > 0){
 	    document.getElementById(node_id).style.color = "";
 	}
+	node_id = 0;
     }
     console.log(node_id);
 }
@@ -35,6 +39,13 @@ function create_request(){
 	request = new XMLHttpRequest();
     }
     return request;
+}
+
+// フォームから情報をとってsendする
+function get_form(cmd){
+    var form = document.forms.form;
+    var task_name = form.task_name.value;
+    var date = form.date.value;
 }
 
 // サーバへ要求を送る
@@ -94,4 +105,3 @@ function rewrite_page(json, pos, user_id){
     }
     return "<ol>\n" + content + "</ol>\n";
 }
-B
