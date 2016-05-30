@@ -22,7 +22,8 @@ function check(){
 	    request.open("GET", "./back.rb" + url, true);
 	    request.onreadystatechange = function(){
 		if(request.readyState == 4){
-		    var res = JSON.parse(request.responseText);
+		    console.log(request.responseText);
+		    var res = JSON.parse(request.responseText || "null");
 		    console.log("res = " + res["exist"]);
 		    if(res['exist']){
 			// ユーザ情報があるとき
