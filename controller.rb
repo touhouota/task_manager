@@ -6,6 +6,7 @@ def create_contents(hash)
   $client = Mysql2::Client.new(host: "localhost", username: "task", password: "Pace_maker1", encoding: "utf8", database: "pace")
   id = hash[:id].first.to_i
   cmd = hash[:cmd].first
+  p hash
   case hash.length
   when 3
     # view
