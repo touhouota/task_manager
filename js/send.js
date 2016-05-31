@@ -59,7 +59,7 @@ function send(user_id, cmd, pos, node_id, add_name, deadline){
 
     switch(cmd){
     case 'add':
-	url +=  "&addel_name=" + add_name + "&add_pos=" + node_id  + "&add_dead=" + deadline;
+	url +=  "&add_name=" + add_name + "&addel_pos=" + node_id  + "&add_dead=" + deadline;
 	break;
     case 'del':
     case 'upgrade':
