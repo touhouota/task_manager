@@ -19,7 +19,7 @@ window.onload = function(){
 // クリックした要素の色を変える
 function listener(ev){
     if(ev.target.id){
-	console.log(node_id);
+	console.log("first:" + node_id);
 	if(node_id > 0){
 	    document.getElementById(node_id).style.color = "";
 	}
@@ -31,7 +31,7 @@ function listener(ev){
 	}
 	node_id = 0;
     }
-    console.log(node_id);
+    console.log("end: " + node_id);
 }
 
 function create_request(){
@@ -48,18 +48,18 @@ function get_form(cmd){
     var task_name = form.task_name.value;
     var date = form.date.value;
     var pos = form.pos.value;
-    send(id, cmd.name, pos, node_id, task_name, date);
+    send(id, cmd, pos, task_name, date);
 }
 
 // サーバへ要求を送る
-function send(user_id, cmd, pos, node_id, add_name, deadline){
+function send(user_id, cmd, pos, add_name, deadline){
     var request = create_request();
     var json = "";
     var url = "?id=" + user_id + "&cmd=" + cmd + "&pos=" + pos;
 
     switch(cmd){
     case 'add':
-	url +=  "&addel_name=" + add_name + "&add_pos=" + node_id  + "&add_dead=" + deadline;
+	url +=  "&add_name=" + add_name + "&addel_pos=" + node_id  + "&add_dead=" + deadline;
 	break;
     case 'del':
     case 'upgrade':
@@ -79,13 +79,15 @@ function send(user_id, cmd, pos, node_id, add_name, deadline){
 		    json = JSON.parse(res);
 		    console.log(json);
 		    document.getElementsByClassName("task_list")[0].innerHTML = rewrite_page(json, pos, user_id);
+		    console.log(node_id);
 		}else{
 		    alert("データの追加/削除/更新に失敗しました");
 		}
 	    }
 	}
 	request.send(null);
-	n_id = 0;
+	node_id = 0;
+	console.log("reset: " + node_id);
     }
 }
 
