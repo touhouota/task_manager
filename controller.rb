@@ -26,10 +26,12 @@ def create_contents(hash)
   case cmd
   when 'add'
     # 追加する部分
-    add(id, pos, addel_pos, add_name, add_dead)
+    add(id, addel_pos, add_name, add_dead)
+    view(id, pos)
   when 'del'
     # 削除する部分
-    delete(id, pos)
+    del(id, addel_pos)
+    view(id, pos)
   when 'view'
     # 表示する部分
     view(id, pos)
@@ -53,9 +55,23 @@ def create_contents(hash)
   end
 end
 
-def add(id, pos, add_pos, add_name, add_dead)
+def add(id, add_pos, add_name, add_dead)
+  # タスクを追加
   $client.query("insert into pace.tasks(user_id, parent_id, task_name, status, deadline) values(#{id}, #{add_pos}, '#{add_name}', 0, '#{add_dead}')")
-  view(id, pos)
+end
+
+def del(id, del_pos)
+  id_array = [del_pos]
+  id_array.each do |id|
+    result = $client.query("select task_id from pace.tasks where parent_id = #{id}")
+    if result.entries.empty?.! then
+      result.each do |hash|
+        id_array.push(hash['task_id']) if hash['task_id']
+        $client.query("delete from pace.tasks where task_id = #{hash['task_id']}")
+      end
+    end
+  end
+  $client.query("delete from pace.tasks where task_id = #{del_pos}")
 end
 
 
