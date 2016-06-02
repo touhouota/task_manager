@@ -74,7 +74,6 @@ def del(id, del_pos)
   $client.query("delete from pace.tasks where task_id = #{del_pos}")
 end
 
-
 def view(id, pos=0)
   print make_tree(id).search(pos).to_json
 end
