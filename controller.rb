@@ -37,6 +37,7 @@ def create_contents(hash)
     view(id, pos)
   when 'new'
   # 新しく作る部分
+    create_user(id)
   when 'group'
   # groupの人を見る部分
   when 'exist'
@@ -76,4 +77,17 @@ end
 
 def view(id, pos=0)
   print make_tree(id).search(pos).to_json
+end
+
+
+def create_user(user_id)
+  $client.query("insert into pace.users(user_id) values(#{user_id})")
+  res = $client.query("select user_id from pace.users where user_id = #{user_id}")
+  hash = {}
+  if res.entries.empty?.! then
+    hash.store("create", true)
+  else
+    hash.store("create", false)
+  end
+  print hash.to_json
 end
