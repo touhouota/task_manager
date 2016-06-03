@@ -85,6 +85,12 @@ def create_user(user_id)
   res = $client.query("select user_id from pace.users where user_id = #{user_id}")
   hash = {}
   if res.entries.empty?.! then
+    array = ["テーマ決め", "調査・作成", "実験・評価", "論文執筆"]
+    $client.query("insert into pace.tasks(user_id, task_name, status, deadline) values(#{user_id}, '卒業研究', 0, '#{Time.new(2017,2,28).strftime("%Y-%m-%d")}')")
+    num = $client.query("select task_id from pace.tasks where user_id = #{user_id} and task_name = '卒業研究'").first['task_id']
+    array.each do |task|
+      $client.query("insert into pace.tasks(parent_id, user_id, task_name, status, deadline) values(#{num}, #{user_id}, '#{task}', 0, '#{Time.now.strftime("%Y-%m-%d")}')")
+    end
     hash.store("create", true)
   else
     hash.store("create", false)
