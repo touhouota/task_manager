@@ -48,7 +48,12 @@ function get_form(cmd){
     var task_name = form.task_name.value;
     var date = form.date.value;
     var pos = form.pos.value;
-    send(id, cmd, pos, task_name, date);
+    console.log(task_name);
+    if(task_name != ""){
+	send(id, cmd, pos, task_name, date);
+    }else{
+	alert("タスク名が空です。何か入力してください");
+    }
 }
 
 // サーバへ要求を送る
@@ -87,11 +92,12 @@ function send(user_id, cmd, pos, add_name, deadline){
 	}
 	request.send(null);
 	node_id = 0;
-	console.log("reset: " + node_id);
+	
     }
 }
 
 
+// サーバからの返答によってHTMLを書き換える関数
 function rewrite_page(json, pos, user_id){
     var content = "";
     for(var num in json){
