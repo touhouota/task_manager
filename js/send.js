@@ -49,10 +49,16 @@ function get_form(cmd){
     var date = form.date.value;
     var pos = form.pos.value;
     console.log(task_name);
-    if(task_name != ""){
-	send(id, cmd, pos, task_name, date);
+    if(cmd == "add"){
+	// タスク追加時に、タスク名がない時はアラートを出す
+	if(task_name != ""){
+	    send(id, cmd, pos, task_name, date);
+	    form.task_name.value = "";
+	}else{
+	    alert("タスク名が空です。何か入力してください");
+	}
     }else{
-	alert("タスク名が空です。何か入力してください");
+	send(id, cmd, pos, task_name, date);
     }
 }
 
@@ -69,6 +75,9 @@ function send(user_id, cmd, pos, add_name, deadline){
     case 'del':
     case 'upgrade':
 	url += "&addel_pos=" + node_id;
+	break;
+    case 'group':
+	url += "&group=" + 1;
 	break;
     }
 
