@@ -82,6 +82,15 @@ class Node
       n.print_child
     end
   end
+
+  def progres_status
+    if @status.between?(0,1) then
+      @status += 1
+    else
+      @status = 0
+    end
+    
+  end
 end
 
 def make_tree(user_id)

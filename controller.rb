@@ -75,11 +75,12 @@ def del(id, del_pos)
   $client.query("delete from pace.tasks where task_id = #{del_pos}")
 end
 
+# タスク一覧を木構造化
 def view(id, pos=0)
   print make_tree(id).search(pos).to_json
 end
 
-
+# ユーザ作成
 def create_user(user_id)
   $client.query("insert into pace.users(user_id) values(#{user_id})")
   res = $client.query("select user_id from pace.users where user_id = #{user_id}")
@@ -96,4 +97,13 @@ def create_user(user_id)
     hash.store("create", false)
   end
   print hash.to_json
+end
+
+# 進捗を更新
+# id: ユーザid, pos: 更新するノードid
+def upgrade(id, pos)
+  node = make_tree(id).search(pos)
+  if node.child.empty? then
+    node.status
+  end
 end
