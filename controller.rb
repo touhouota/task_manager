@@ -65,6 +65,7 @@ def add(id, add_pos, add_name, add_dead)
 end
 
 def del(id, del_pos)
+  node = make_tree(id).search(del_pos).parent
   id_array = [del_pos]
   id_array.each do |id|
     result = $client.query("select task_id from pace.tasks where parent_id = #{id}")

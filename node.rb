@@ -90,27 +90,23 @@ class Node
     else
       @status = 0
     end
-    $client.query("update pace.tasks set status = #{@status} where task_id = #{@node_id}");
-    parent_progress
+    $client.query("update pace.tasks set status = #{@status} where task_id = #{@node_id}")
+    @parent.parent_progress
   end
 
   # statusの更新を親へ波及させる
   def parent_progress
-    p = @parent
-    while true
-      sum = p.child.inject(0){|sum, node| sum += node.status}
+      sum = @child.inject(0){|sum, node| sum += node.status}
       case sum
       when 0
-        p.status = 0
-      when p.child.length * 2
-        p.status = 2
+        @status = 0
+      when @child.length * 2
+        @status = 2
       else
-        p.status = 1
+        @status = 1
       end
-      $client.query("update pace.tasks set status = #{p.status} where task_id = #{p.node_id}");
-      p = p.parent
-      break unless p.parent
-    end
+      $client.query("update pace.tasks set status = #{@status} where task_id = #{@node_id}")
+      @parent.parent_progress unless @parent
   end
 end
 
