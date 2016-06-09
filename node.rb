@@ -4,7 +4,7 @@ require 'mysql2'
 
 class Node
   attr_accessor :node_id, :parent, :deadline, :status, :task_name, :child
-
+  
   def initialize(hash={:task_id => 0, :task_name => 'root'}, parent = nil)
     @node_id = hash[:task_id]
     @parent = parent
@@ -82,14 +82,35 @@ class Node
       n.print_child
     end
   end
-
+  
+  # 自分の進捗を更新し、親のも更新する
   def progres_status
     if @status.between?(0,1) then
       @status += 1
     else
       @status = 0
     end
-    
+    $client.query("update pace.tasks set status = #{@status} where task_id = #{@node_id}");
+    parent_progress
+  end
+
+  # statusの更新を親へ波及させる
+  def parent_progress
+    p = @parent
+    while true
+      sum = p.child.inject(0){|sum, node| sum += node.status}
+      case sum
+      when 0
+        p.status = 0
+      when p.child.length * 2
+        p.status = 2
+      else
+        p.status = 1
+      end
+      $client.query("update pace.tasks set status = #{p.status} where task_id = #{p.node_id}");
+      p = p.parent
+      break unless p.parent
+    end
   end
 end
 

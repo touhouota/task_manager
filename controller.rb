@@ -35,6 +35,9 @@ def create_contents(hash)
   when 'view'
     # 表示する部分
     view(id, pos)
+  when 'upgrade'
+    upgrade(id, addel_pos)
+    view(id, pos)
   when 'new'
   # 新しく作る部分
     create_user(id)
@@ -103,7 +106,9 @@ end
 # id: ユーザid, pos: 更新するノードid
 def upgrade(id, pos)
   node = make_tree(id).search(pos)
-  if node.child.empty? then
-    node.status
+  node.progres_status if node
+  while node
+    $client.query("update pace.tasks set status = #{node.status} where node_id = #{node.node_id}")
+    node = node.parent
   end
 end
