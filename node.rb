@@ -85,16 +85,19 @@ class Node
   
   # 自分の進捗を更新し、親のも更新する
   def progres_status
-    if @status.between?(0,1) then
-      @status += 1
-    else
-      @status = 0
+    # 子供がいない時のみ、進捗を更新する
+    if @child.length == 0 then
+      if @status.between?(0,1) then
+        @status += 1
+      else
+        @status = 0
+      end
+      $client.query("update pace.tasks set status = #{@status} where task_id = #{@node_id}")
+      @parent.parent_progress
     end
-    $client.query("update pace.tasks set status = #{@status} where task_id = #{@node_id}")
-    @parent.parent_progress
   end
 
-  # statusの更新を親へ波及させる
+  # 子供の進捗から、自分の進捗を計算する
   def parent_progress
       sum = @child.inject(0){|sum, node| sum += node.status}
       case sum
@@ -106,7 +109,7 @@ class Node
         @status = 1
       end
       $client.query("update pace.tasks set status = #{@status} where task_id = #{@node_id}")
-      @parent.parent_progress unless @parent
+      @parent.parent_progress unless @parent.task_name == 'root'
   end
 end
 
