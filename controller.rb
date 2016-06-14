@@ -27,11 +27,16 @@ def create_contents(hash)
   when 'add'
     # 追加する部分
     add(id, addel_pos, add_name, add_dead)
-    make_tree(id).search(addel_pos).progres_status
+    node = make_tree(id).search(addel_pos)
+    upgrade(id, addel_pos, node)
     view(id, pos)
   when 'del'
     # 削除する部分
+    node = make_tree(id).search(addel_pos)
+    parent = node.parent
+    node.delete
     del(id, addel_pos)
+    upgrade(id, nil, parent)
     view(id, pos)
   when 'view'
     # 表示する部分
@@ -66,10 +71,9 @@ def add(id, add_pos, add_name, add_dead)
 end
 
 def del(id, del_pos)
-  node = make_tree(id).search(del_pos).parent
   id_array = [del_pos]
-  id_array.each do |id|
-    result = $client.query("select task_id from pace.tasks where parent_id = #{id}")
+  id_array.each do |del_node|
+    result = $client.query("select task_id from pace.tasks where parent_id = #{del_node}")
     if result.entries.empty?.! then
       result.each do |hash|
         id_array.push(hash['task_id']) if hash['task_id']
@@ -105,10 +109,17 @@ def create_user(user_id)
 end
 
 # 進捗を更新
-# id: ユーザid, pos: 更新するノードid
-def upgrade(id, pos)
-  node = make_tree(id).search(pos)
-  node.progres_status if node
+# id: ユーザid
+# pos: 更新するノードid
+# addel: add/delならばnodeクラスが、それ以外ならばfalseが入ってる
+def upgrade(id, pos, addel = false)
+  if addel then
+    node = addel
+    node.parent_progress
+  else
+    node = make_tree(id).search(pos)
+    node.progres_status if node
+  end
   until node.root?
     $client.query("update pace.tasks set status = #{node.status} where task_id = #{node.node_id}")
     node = node.parent

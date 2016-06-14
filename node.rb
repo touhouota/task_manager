@@ -24,7 +24,6 @@ class Node
     #$client.query("delete from pace.tasks where task_id = #{@node_id}")
     @parent.child.delete(self)
     @parent = nil
-    @child = nil
   end
 
   def route
@@ -112,6 +111,13 @@ class Node
       end
       #$client.query("update pace.tasks set status = #{@status} where task_id = #{@node_id}")
       @parent.parent_progress unless @parent.task_name == 'root'
+  end
+
+  def print_tree
+    @child.each do |n|
+      puts "#{n.task_name}, #{n.parent}"
+      n.print_tree
+    end
   end
 end
 
