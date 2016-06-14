@@ -27,6 +27,7 @@ def create_contents(hash)
   when 'add'
     # 追加する部分
     add(id, addel_pos, add_name, add_dead)
+    make_tree(id).search(addel_pos).progres_status
     view(id, pos)
   when 'del'
     # 削除する部分
@@ -108,8 +109,8 @@ end
 def upgrade(id, pos)
   node = make_tree(id).search(pos)
   node.progres_status if node
-  while node
-    $client.query("update pace.tasks set status = #{node.status} where node_id = #{node.node_id}")
+  until node.root?
+    $client.query("update pace.tasks set status = #{node.status} where task_id = #{node.node_id}")
     node = node.parent
   end
 end

@@ -4,7 +4,7 @@ require 'mysql2'
 
 class Node
   attr_accessor :node_id, :parent, :deadline, :status, :task_name, :child
-  
+  @@user_id = 0
   def initialize(hash={:task_id => 0, :task_name => 'root'}, parent = nil)
     @node_id = hash[:task_id]
     @parent = parent
@@ -16,11 +16,13 @@ class Node
 
   def add_child(hash)
     @child.push(Node.new(hash,self))
+    #$client.query("insert into pace.tasks(user_id, parent_id, task_name, status, deadline) values(#{hash[:user_id]}, #{@node_id}, #{hash[:task_name]}, 0, #{hash[:add_dead]})")
   end
 
   def delete
     # ノードの削除
-    $client.query("delete from pace.tasks where task_id = #{@node_id}")
+    #$client.query("delete from pace.tasks where task_id = #{@node_id}")
+    @parent.child.delete(self)
     @parent = nil
     @child = nil
   end
@@ -42,6 +44,15 @@ class Node
       tmp = @parent
     end
     return tmp
+  end
+
+  def root?
+    # そのノードがrootかどうかを返す
+    if(@parent) then
+      false  # @parentがnilでなければrootではない
+    else
+      true   # @parentがnilの場合はroot
+    end
   end
 
   def search(id)
@@ -74,15 +85,6 @@ class Node
     return '[' + str.chop + ']'
   end
 
-  def print_child
-    # デバッグ用
-    print @task_name + " parent: "
-    puts (@parent.nil?) ? 'nil' : @parent.task_name
-    @child.each do |n|
-      n.print_child
-    end
-  end
-  
   # 自分の進捗を更新し、親のも更新する
   def progres_status
     # 子供がいない時のみ、進捗を更新する
@@ -92,7 +94,7 @@ class Node
       else
         @status = 0
       end
-      $client.query("update pace.tasks set status = #{@status} where task_id = #{@node_id}")
+      #$client.query("update pace.tasks set status = #{@status} where task_id = #{@node_id}")
       @parent.parent_progress
     end
   end
@@ -108,7 +110,7 @@ class Node
       else
         @status = 1
       end
-      $client.query("update pace.tasks set status = #{@status} where task_id = #{@node_id}")
+      #$client.query("update pace.tasks set status = #{@status} where task_id = #{@node_id}")
       @parent.parent_progress unless @parent.task_name == 'root'
   end
 end
