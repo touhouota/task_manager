@@ -27,13 +27,22 @@ def create_contents(hash)
   when 'add'
     # 追加する部分
     add(id, addel_pos, add_name, add_dead)
+    node = make_tree(id).search(addel_pos)
+    upgrade(id, addel_pos, node)
     view(id, pos)
   when 'del'
     # 削除する部分
+    node = make_tree(id).search(addel_pos)
+    parent = node.parent
+    node.delete
     del(id, addel_pos)
+    upgrade(id, nil, parent)
     view(id, pos)
   when 'view'
     # 表示する部分
+    view(id, pos)
+  when 'upgrade'
+    upgrade(id, addel_pos)
     view(id, pos)
   when 'new'
   # 新しく作る部分
@@ -63,8 +72,8 @@ end
 
 def del(id, del_pos)
   id_array = [del_pos]
-  id_array.each do |id|
-    result = $client.query("select task_id from pace.tasks where parent_id = #{id}")
+  id_array.each do |del_node|
+    result = $client.query("select task_id from pace.tasks where parent_id = #{del_node}")
     if result.entries.empty?.! then
       result.each do |hash|
         id_array.push(hash['task_id']) if hash['task_id']
@@ -75,11 +84,12 @@ def del(id, del_pos)
   $client.query("delete from pace.tasks where task_id = #{del_pos}")
 end
 
+# タスク一覧を木構造化
 def view(id, pos=0)
   print make_tree(id).search(pos).to_json
 end
 
-
+# ユーザ作成
 def create_user(user_id)
   $client.query("insert into pace.users(user_id) values(#{user_id})")
   res = $client.query("select user_id from pace.users where user_id = #{user_id}")
@@ -96,4 +106,22 @@ def create_user(user_id)
     hash.store("create", false)
   end
   print hash.to_json
+end
+
+# 進捗を更新
+# id: ユーザid
+# pos: 更新するノードid
+# addel: add/delならばnodeクラスが、それ以外ならばfalseが入ってる
+def upgrade(id, pos, addel = false)
+  if addel then
+    node = addel
+    node.parent_progress
+  else
+    node = make_tree(id).search(pos)
+    node.progres_status if node
+  end
+  until node.root?
+    $client.query("update pace.tasks set status = #{node.status} where task_id = #{node.node_id}")
+    node = node.parent
+  end
 end

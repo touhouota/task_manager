@@ -4,7 +4,7 @@ require 'mysql2'
 
 class Node
   attr_accessor :node_id, :parent, :deadline, :status, :task_name, :child
-
+  @@user_id = 0
   def initialize(hash={:task_id => 0, :task_name => 'root'}, parent = nil)
     @node_id = hash[:task_id]
     @parent = parent
@@ -16,13 +16,14 @@ class Node
 
   def add_child(hash)
     @child.push(Node.new(hash,self))
+    #$client.query("insert into pace.tasks(user_id, parent_id, task_name, status, deadline) values(#{hash[:user_id]}, #{@node_id}, #{hash[:task_name]}, 0, #{hash[:add_dead]})")
   end
 
   def delete
     # ノードの削除
-    $client.query("delete from pace.tasks where task_id = #{@node_id}")
+    #$client.query("delete from pace.tasks where task_id = #{@node_id}")
+    @parent.child.delete(self)
     @parent = nil
-    @child = nil
   end
 
   def route
@@ -42,6 +43,15 @@ class Node
       tmp = @parent
     end
     return tmp
+  end
+
+  def root?
+    # そのノードがrootかどうかを返す
+    if(@parent) then
+      false  # @parentがnilでなければrootではない
+    else
+      true   # @parentがnilの場合はroot
+    end
   end
 
   def search(id)
@@ -74,12 +84,39 @@ class Node
     return '[' + str.chop + ']'
   end
 
-  def print_child
-    # デバッグ用
-    print @task_name + " parent: "
-    puts (@parent.nil?) ? 'nil' : @parent.task_name
+  # 自分の進捗を更新し、親のも更新する
+  def progres_status
+    # 子供がいない時のみ、進捗を更新する
+    if @child.length == 0 then
+      if @status.between?(0,1) then
+        @status += 1
+      else
+        @status = 0
+      end
+      #$client.query("update pace.tasks set status = #{@status} where task_id = #{@node_id}")
+      @parent.parent_progress
+    end
+  end
+
+  # 子供の進捗から、自分の進捗を計算する
+  def parent_progress
+      sum = @child.inject(0){|sum, node| sum += node.status}
+      case sum
+      when 0
+        @status = 0
+      when @child.length * 2
+        @status = 2
+      else
+        @status = 1
+      end
+      #$client.query("update pace.tasks set status = #{@status} where task_id = #{@node_id}")
+      @parent.parent_progress unless @parent.task_name == 'root'
+  end
+
+  def print_tree
     @child.each do |n|
-      n.print_child
+      puts "#{n.task_name}, #{n.parent}"
+      n.print_tree
     end
   end
 end
