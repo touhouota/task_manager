@@ -5,9 +5,9 @@ var status_array = ["未着手...", "進行中", "終了！"];
 var id;
 
 window.onload = function(){
-    console.log("きたよ");
     var target = document.getElementsByClassName("task_list")[0];
     target.addEventListener("click", listener, false);
+    target.addEventListener("dblclick", double_click, false);
     // 読み込み時に、最上位ノードを表示
     id = location.search.substr(4);
     console.log(id);
@@ -32,6 +32,44 @@ function listener(ev){
 	node_id = 0;
     }
     console.log("end: " + node_id);
+}
+
+function double_click(ev){
+    if(ev.target.id){
+	var click_pos = document.getElementById(ev.target.id);
+	var parent = click_pos.parentElement;
+	var inputs = [];
+	for(var i = 0; i < 2; i++){
+	    inputs.push(document.createElement('input'));
+	}
+	inputs.push(document.createElement("select"));
+	var content = click_pos.innerHTML.split(',');
+
+	// タスク名
+	inputs[0].name = "add";
+	inputs[0].value = content[0];
+
+	// 日付
+	inputs[1].name = "date";
+	inputs[1].type = "date";
+	inputs[1].value = content[1];
+
+	// 進捗部分(セレクタにする)
+	inputs[2].id="status"
+	for(var i in status_array){
+	    var node = document.createElement('option');
+	    node.innerHTML = status_array[i];
+	    inputs[2].appendChild(node);
+	}
+
+	for(var i in inputs){
+	    console.log(inputs[i]);
+	    parent.insertBefore(inputs[i], click_pos);
+	}
+	parent.removeChild(click_pos);
+    }else{
+	alert("ミス");
+    }
 }
 
 function create_request(){
@@ -124,4 +162,17 @@ function rewrite_page(json, pos, user_id){
 	content += "</li>\n";
     }
     return "<ol>\n" + content + "</ol>\n";
+}
+
+// ダブルクリックされた時、formを作って名前の変更を行う
+var prevElement = null;
+function check_blur(obj){
+    var now = obj.parentElement;
+    console.log(now);
+    if(prevElement != now){
+	confirm("別のもの");
+    }else{
+	confirm("同じもの");
+    }
+    prevElement = now;
 }
