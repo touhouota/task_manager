@@ -66,7 +66,7 @@ function double_click(ev){
 	    console.log(inputs[i]);
 	    parent.insertBefore(inputs[i], click_pos);
 	}
-	parent.removeChild(click_pos);
+	click_pos.style = "visibility: hidden;";
     }else{
 	alert("ミス");
     }
