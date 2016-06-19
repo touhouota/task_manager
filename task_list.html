@@ -1,28 +1,29 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <title>タスク管理するやつ</title>
-  <meta charset="utf-8">
-</head>
-<body>
-  <div class="user_name">
-    <!-- ユーザ名がここに入る  -->
-  </div>
-  <div class="task_list">
-    <!-- タスク一覧がここに入る  -->
-  </div>
-  <form class="form" name="controll_form" onsubmit="return false">
-    <input type="text" name="task_name" value="" onblur="check_blur(this)">
-    <input type="date" name="date"  onblur="check_blur(this)"><br>
-    <input type="button" name="add" value="タスク追加" onclick="get_form('add')">
-    <input type="button" name="upgrade" value="進捗更新" onclick="get_form('upgrade')">
-    <input type="button" name="del" value="タスク削除" onclick="get_form('del')">
-    <input type="hidden" name="pos" value="">
-  </form>
-  <div id="group">
-    <!-- ここにグループの進捗が入る -->
-  </div>
-  <script type="text/javascript" src="./js/send.js">
-  </script>
-</body>
+  <head>
+    <title>タスク管理するやつ</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" type="text/css" href="./css/task_list.css">
+  </head>
+  <body>
+    <div class="user_name">
+      <!-- ユーザ名がここに入る  -->
+    </div>
+    <div class="task_list" id="task_list">
+      <!-- タスク一覧がここに入る  -->
+    </div>
+    <form class="form" name="controll_form" onsubmit="return false">
+      <input type="text" name="task_name" value="">
+      <input type="date" name="date" ><br />
+      <input type="button" name="add" value="タスク追加" onclick="get_form('add')">
+      <input type="button" name="upgrade" value="進捗更新" onclick="get_form('upgrade')">
+      <input type="button" name="del" value="タスク削除" onclick="get_form('del')">
+      <input type="hidden" name="pos" value="">
+    </form>
+    <div id="group">
+      <!-- ここにグループの進捗が入る -->
+    </div>
+    <script type="text/javascript" src="./js/send.js">
+    </script>
+  </body>
 </html>
