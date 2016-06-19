@@ -15,9 +15,10 @@ function exist_user(){
     if(request.readyState == 4){
 	console.log(request.responseText);
 	var res = JSON.parse(request.responseText || "null");
-	console.log("res = " + res["exist"]);
 	if(res['exist']){
 	    // ユーザ情報があるとき
+	    document.cookie = "id=" + encodeURIComponent(res['id']);
+	    document.cookie = "name=" + encodeURIComponent(res['name']);
 	    window.location = "./task_list.html?id=" + form;
 	}else{
 	    var message;
@@ -53,7 +54,7 @@ function check(){
 	alert("フォームが空です。idを入力してください");
     }else{
 	request = createRequest();
-	url = "?id=" + form + "&cmd=exist"
+	url = "?id=" + form + "&cmd=exist";
 	if(request){
 	    request.open("GET", "./back.rb" + url, true);
 	    request.onreadystatechange = exist_user;

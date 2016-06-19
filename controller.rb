@@ -6,22 +6,11 @@ def create_contents(hash)
   $client = Mysql2::Client.new(host: "localhost", username: "task", password: "Pace_maker1", encoding: "utf8", database: "pace")
   id = hash[:id].first.to_i
   cmd = hash[:cmd].first
-
-  case hash.length
-  when 3
-    # view
-    pos = hash[:pos].first.to_i if hash[:pos]
-  when 4
-    # del
-    pos = hash[:pos].first.to_i if hash[:pos]
-    addel_pos = hash[:addel_pos].first.to_i if hash[:addel_pos]
-  when 6
-    # add
-    pos = hash[:pos].first.to_i if hash[:pos]
-    addel_pos = hash[:addel_pos].first.to_i if hash[:addel_pos]
-    add_name = hash[:add_name].first if hash[:add_name]
-    add_dead = hash[:add_dead].first if hash[:add_dead]
-  end
+  pos = hash[:pos].first.to_i if hash[:pos]
+  addel_pos = hash[:addel_pos].first.to_i if hash[:addel_pos]
+  add_name = hash[:add_name].first if hash[:add_name]
+  add_dead = hash[:add_dead].first if hash[:add_dead]
+  status = hash[:status].first.to_i if hash[:status]
 
   case cmd
   when 'add'
@@ -42,6 +31,12 @@ def create_contents(hash)
     # 表示する部分
     view(id, pos)
   when 'upgrade'
+    # 進捗を更新する部分
+    upgrade(id, addel_pos)
+    view(id, pos)
+  when 'update'
+  # タスク名を更新する部分
+    update(addel_pos, add_name, add_dead, status)
     upgrade(id, addel_pos)
     view(id, pos)
   when 'new'
@@ -57,6 +52,8 @@ def create_contents(hash)
       h.store("exist", false)
     else
       h.store("exist", true)
+      h.store("id", id)
+      h.store("name", res.entries.first['name'])
     end
     print h.to_json
   else
@@ -113,6 +110,7 @@ end
 # pos: 更新するノードid
 # addel: add/delならばnodeクラスが、それ以外ならばfalseが入ってる
 def upgrade(id, pos, addel = false)
+  controll = false
   if addel then
     node = addel
     node.parent_progress
@@ -124,4 +122,9 @@ def upgrade(id, pos, addel = false)
     $client.query("update pace.tasks set status = #{node.status} where task_id = #{node.node_id}")
     node = node.parent
   end
+end
+
+# タスク名をリネーム
+def update(pos, add_name, add_dead, status)
+  $client.query("update pace.tasks set task_name = '#{add_name}', deadline = '#{add_dead}', status = #{status} where task_id = #{pos}")
 end
