@@ -1,5 +1,6 @@
 # coding: utf-8
 require './node'
+require 'uri'
 
 def create_contents(hash)
   hash = symbolize_keys(hash)
@@ -8,7 +9,7 @@ def create_contents(hash)
   cmd = hash[:cmd].first
   pos = hash[:pos].first.to_i if hash[:pos]
   addel_pos = hash[:addel_pos].first.to_i if hash[:addel_pos]
-  add_name = hash[:add_name].first if hash[:add_name]
+  add_name = URI.unescape(hash[:add_name].first) if hash[:add_name]
   add_dead = hash[:add_dead].first if hash[:add_dead]
   status = hash[:status].first.to_i if hash[:status]
 
@@ -122,6 +123,18 @@ def upgrade(id, pos, addel = false)
     $client.query("update pace.tasks set status = #{node.status} where task_id = #{node.node_id}")
     node = node.parent
   end
+end
+
+def group(user_id, pos)
+  # ユーザと同じグループにいるユーザを一覧で取得
+  users = $client.query("select user_id from pace.users where group_id = (select group_id from pace.users where user_id = #{user_id})")
+  content = ""
+  users.each do |user|
+    # 暫定対応：教員のid問題をどうにかしてくれ
+    next if(user['user_id'] < 1 || user['user_id'] == user_id)
+    content += make_tree(user['user_id']).search(pos).to_json + ","
+  end
+  print '[' + content.chop + ']'
 end
 
 # タスク名をリネーム

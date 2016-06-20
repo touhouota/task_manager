@@ -1,11 +1,11 @@
-// クリックで選択している要素のid保A持
+// クリックで選択している要素のid保持
 var node_id = 0;
 // statusの文句配列
 var status_array = ["未着手...", "進行中", "終了！"];
 var id;
 
 window.onload = function(){
-    var target = document.getElementsByClassName("task_list")[0];
+    var target = document.getElementById("task_list");
     target.addEventListener("click", listener, false);
     target.addEventListener("dblclick", double_click, false);
     // 読み込み時に、最上位ノードを表示
@@ -14,6 +14,7 @@ window.onload = function(){
     console.log(document.cookie);
     document.getElementsByClassName("user_name")[0].innerHTML = id;
     send(id, "view", 0);
+    send(id, "group", 0);
     document.forms.controll_form.pos.value = "0";
     var time = 1000 * 60; // ミリ秒を分へ変換
     setInterval(repetition, time * 2);
@@ -92,7 +93,7 @@ function double_click(ev){
 
 // 一定時間、繰り返す内容をここに
 function repetition(){
-    var pos = document.forms.controll_form.pos;
+    var pos = document.forms.controll_form.pos.value;
     console.log("グループメンバーの進捗確認するよ");
     send(id, 'group', pos);
 }
@@ -129,13 +130,13 @@ function send(user_id, cmd, pos, add_name, deadline, status){
     var request = create_request();
     var json = "";
     var url = "?id=" + user_id + "&cmd=" + cmd + "&pos=" + pos;
-
+    var add_name_escape = encodeURIComponent(add_name);
     switch(cmd){
     case 'add':
-	url +=  "&add_name=" + add_name + "&addel_pos=" + node_id  + "&add_dead=" + deadline;
+	url +=  "&add_name=" + add_name_escape + "&addel_pos=" + node_id  + "&add_dead=" + deadline;
 	break;
     case 'update':
-	url +=  "&add_name=" + add_name + "&addel_pos=" + node_id  + "&add_dead=" + deadline + "&status=" + status;
+	url +=  "&add_name=" + add_name_escape + "&addel_pos=" + node_id  + "&add_dead=" + deadline + "&status=" + status;
     case 'del':
     case 'upgrade':
 	url += "&addel_pos=" + node_id;
@@ -154,14 +155,14 @@ function send(user_id, cmd, pos, add_name, deadline, status){
 		console.log(request.responseText);
 		res = request.responseText;
 		if(res != ''){
-		    json = JSON.parse(res);
+		    var json = JSON.parse(res);
 		    console.log(json);
 		    if(cmd == 'group'){
 			// グループを表示する時は、こっち
-			document.getElementById('group').innerHTML = rewrite_page(json,pos,user_id);
+			document.getElementById('group').innerHTML = rewrite_page(json);
 		    }else{
 			// それ以外は、自分のところに出力
-			document.getElementById("task_list").innerHTML = rewrite_page(json, pos, user_id);
+			document.getElementById("task_list").innerHTML = rewrite_page(json);
 		    }
 		    console.log(node_id);
 		}else{
@@ -176,11 +177,12 @@ function send(user_id, cmd, pos, add_name, deadline, status){
 
 
 // サーバからの返答によってHTMLを書き換える関数
-function rewrite_page(json, pos, user_id){
+function rewrite_page(json){
     var content = "";
     for(var num in json){
+	console.log(json[num]);
 	var node = json[num].node;
-	//console.log(node);
+	//console.log(json[num].node);
 	content += "<li>\n";
 	content += '<span id="' + node.node_id + '" class="status' + node.status  + '">' + "\n";
 	content += node.task_name + ",";
@@ -207,3 +209,12 @@ function check_blur(){
     send(id, "update", pos, add, deadline, status);
     console.log("send!!");
 }
+
+/////////////////////////////////////////////////////////////////////////
+/// canvas 部分
+/////////////////////////////////////////////////////////////////////////
+
+var canvas = document.getElementById("can");
+var context = canvas.getContext("2d");
+context.fillStyle = "#fff";
+context.fillRect(0, 0, canvas.width, canvas.height);
